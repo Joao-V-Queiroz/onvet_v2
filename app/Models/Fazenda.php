@@ -12,4 +12,17 @@ class Fazenda extends Model
     use SoftDeletes;
 
     protected $guarded = ['id'];
+
+    protected $fillable = [
+        'nome',
+        'cep',
+        'cidade',
+        'uf',
+        'logradouro',
+        'numero',
+        'bairro',
+        'complemento',
+        'status',
+    ];
+
 }

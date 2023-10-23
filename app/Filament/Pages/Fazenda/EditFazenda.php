@@ -4,74 +4,35 @@ namespace App\Filament\Pages\Fazenda;
 
 use Filament\Forms\Form;
 use Filament\Pages\Page;
-use Filament\Tables\Table;
-use Filament\Tables\Actions\Action;
-use Filament\Forms\Contracts\HasForms;
-use Filament\Tables\Columns\TextColumn;
-use Filament\Tables\Contracts\HasTable;
 use App\Forms\Components\PostalCode;
+use Filament\Forms\Components\Toggle;
+use Filament\Forms\Contracts\HasForms;
 use App\Models\Fazenda as ModelsFazenda;
 use Filament\Forms\Components\TextInput;
-use Filament\Forms\Components\Toggle;
 use Filament\Forms\Concerns\InteractsWithForms;
-use Filament\Tables\Concerns\InteractsWithTable;
 
-class Fazenda extends Page implements HasForms, HasTable
+class EditFazenda extends Page implements HasForms
 {
-    use InteractsWithTable;
+
     use InteractsWithForms;
 
-    protected static ?string $navigationIcon = 'heroicon-o-home-modern';
+    protected static string $view = 'filament.pages.fazenda.edit-fazenda';
     protected static ?string $title = '';
-    protected static ?string $navigationLabel = 'Fazendas';
-    protected static ?string $navigationGroup = 'Cadastro';
-    protected static ?int $navigationSort = 0;
-    protected static string $view = 'filament.pages.fazenda.fazenda-page';
+    protected static bool $shouldRegisterNavigation = false;
 
-    public $showNovaFazenda = false;
+    //variaveis
     public $nome;
     public $cep;
     public $logradouro;
     public $cidade;
-    public $uf;
-    public $numero;
-    public $complemento;
     public $bairro;
+    public $numero;
+    public $uf;
+    public $complemento;
     public $status;
+    public $dados;
+    public $showNovaFazenda = false;
 
-    public function table(Table $table): Table
-    {
-        return $table
-            ->query(ModelsFazenda::query())
-            ->columns([
-                TextColumn::make('nome')->label('Nome')->searchable()->sortable(),
-                TextColumn::make('cidade')->label('Cidade'),
-                TextColumn::make('uf')->label('UF'),
-                TextColumn::make('logradouro')->label('Logradouro'),
-            ])
-            ->filters([
-                // ...
-            ])
-            ->actions([
-                Action::make('view')
-                    ->label('Visualizar')
-                    ->icon('heroicon-o-eye')
-                    ->url(fn (ModelsFazenda $record) => route('filament.admin.pages.view-fazenda', ["id" => $record])),
-                Action::make('edit')
-                    ->label('Editar')
-                    ->icon('heroicon-o-pencil')
-                    ->url(fn (ModelsFazenda $record) => route('filament.admin.pages.edit-fazenda', ["id" => $record])),
-                Action::make('delete')
-                    ->label('Excluir')
-                    ->color('danger')
-                    ->icon('heroicon-o-trash')
-                    ->requiresConfirmation()
-                    ->action(fn (ModelsFazenda $record) => $record->delete()),
-            ])
-            ->bulkActions([
-                // ...
-            ]);
-    }
 
     public function form(Form $form): Form
     {
@@ -119,7 +80,7 @@ class Fazenda extends Page implements HasForms, HasTable
                     ->label('Complemento')
                     ->columnSpan(2)
                     ->maxLength(255),
-                 Toggle::make('status')
+                Toggle::make('status')
                     ->label('Status')
                     ->onColor('success')
                     ->offColor('danger')
@@ -131,11 +92,46 @@ class Fazenda extends Page implements HasForms, HasTable
     public function save()
     {
         $dados = $this->form->getState();
-
-        ModelsFazenda::create($dados);
-        $this->form->fill();
-
+        ModelsFazenda::where('id', $this->dados->id)->update($dados);
         return redirect()->to('/admin/fazenda');
+    }
+
+    public function voltar()
+    {
+       return redirect()->to('/admin/fazenda');
+    }
+
+    public function excluir()
+    {
+        $this->dados->delete();
+        return redirect()->to('/admin/fazenda');
+    }
+
+    public function mount()
+    {
+        $id = request()->id;
+        $this->dados = ModelsFazenda::find($id);
+        $this->nome = $this->dados->nome;
+        $this->cep = $this->dados->cep;
+        $this->logradouro = $this->dados->logradouro;
+        $this->cidade = $this->dados->cidade;
+        $this->bairro = $this->dados->bairro;
+        $this->numero = $this->dados->numero;
+        $this->uf = $this->dados->uf;
+        $this->complemento = $this->dados->complemento;
+        $this->status = $this->dados->status;
+
+        $this->form->fill([
+            'nome' => $this->nome,
+            'cep' => $this->cep,
+            'logradouro' => $this->logradouro,
+            'cidade' => $this->cidade,
+            'bairro' => $this->bairro,
+            'numero' => $this->numero,
+            'uf' => $this->uf,
+            'complemento' => $this->complemento,
+            'status' => $this->status,
+        ]);
     }
 
     public function novaFazenda($value)
@@ -143,4 +139,5 @@ class Fazenda extends Page implements HasForms, HasTable
         $this->showNovaFazenda = $value;
         $this->form->fill();
     }
+
 }

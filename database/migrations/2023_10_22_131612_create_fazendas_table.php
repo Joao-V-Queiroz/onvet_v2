@@ -12,7 +12,7 @@ return new class extends Migration
             $table->id();
             $table->string('nome')->maxlenght(255);
             $table->string('cep')->nullable();
-            $table->string('cidade')->nullable();
+			$table->string('cidade')->nullable();
 			$table->string('uf')->nullable();
 			$table->string('logradouro')->nullable();
 			$table->integer('numero')->nullable();
