@@ -5,6 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use App\Models\Tanque;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Fazenda extends Model
 {
@@ -24,5 +26,10 @@ class Fazenda extends Model
         'complemento',
         'status',
     ];
+
+    public function tanques(): HasOne
+    {
+        return $this->hasMany(Tanque::class);
+    }
 
 }
