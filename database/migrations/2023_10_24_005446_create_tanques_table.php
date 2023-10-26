@@ -14,6 +14,7 @@ return new class extends Migration
             $table->string('nome')->maxlength(255);
             $table->integer('capacidade')->nullable();
             $table->string('observacoes')->nullable();
+            $table->boolean('status')->default(true);
             $table->softDeletes();
             $table->timestamps();
         });
